@@ -1,1 +1,1 @@
- # SmartQueryStudioAzureApi
+# SmartQueryStudioAzureApi
