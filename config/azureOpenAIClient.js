@@ -150,6 +150,7 @@ Standard Types Reference:
 - { "type": "visualization", "chartType": "...", "chartData": { ... } }
 - { "type": "error", "message": "..." }
 
+
 Return ONLY the final JSON. No backticks, no markdown.
 `;
 

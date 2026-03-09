@@ -54,6 +54,13 @@ app.get("/api/protected", injectAppToken, (req, res) => {
     },
   });
 });
+router.get("/api/user", (req, res) => {
+  if (req.session && req.session.user) {
+    res.json(req.user || req.session.user);
+  } else {
+    res.status(401).json({ error: "Not authenticated" });
+  }
+});
 app.use("/api/query", injectAppToken, queryRouter);
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
