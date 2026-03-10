@@ -54,7 +54,7 @@ app.get("/api/protected", injectAppToken, (req, res) => {
     },
   });
 });
-router.get("/api/user", (req, res) => {
+app.get("/api/user", (req, res) => {
   if (req.session && req.session.user) {
     res.json(req.user || req.session.user);
   } else {

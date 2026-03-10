@@ -5,7 +5,8 @@
   "main": "daemon_app.js",
   "scripts": {
     "start": "node daemon_app.js",
-    "dev": "nodemon daemon_app.js"
+    "dev": "nodemon daemon_app.js",
+    "build": "echo \"Production build complete. This Node.js project does not require transpilation.\""
   },
   "keywords": [],
   "author": "",
