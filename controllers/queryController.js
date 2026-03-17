@@ -1,4 +1,11 @@
+/**
+ * @file controllers/queryController.js
+ * @description Controller for handling AI-powered search queries and visualization requests.
+ * Orchestrates calls between the Azure OpenAI primary agent and the response structuring helper.
+ */
+
 const {
+
   client,
   SYSTEM_PROMPT,
   RESPONSE_HELPER_PROMPT,
@@ -6,6 +13,14 @@ const {
 } = require("../config/azureOpenAIClient");
 const axios = require("axios");
 
+/**
+ * Fetches current weather data for a given city using Open-Meteo API.
+ * Performs geocoding first to retrieve coordinates.
+ * 
+ * @param {string} city - The name of the city.
+ * @returns {Promise<{city: string, temperature: number, windspeed: number}>} Weather data object.
+ * @throws {Error} If the city is not found or API call fails.
+ */
 async function getWeather(city) {
   // Step 1: Get coordinates
   const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`;
@@ -25,11 +40,17 @@ async function getWeather(city) {
   };
 }
 
+
 /**
- * callResponseHelper
  * Passes original query and system agent result to the helper agent for structuring.
+ * Ensures the final output adheres to the expected JSON schema for the frontend.
+ * 
+ * @param {string} userQuery - The original natural language query from the user.
+ * @param {Object} systemResponse - The raw result from the primary AI logic or tool output.
+ * @returns {Promise<Object>} Polished JSON response object.
  */
 async function callResponseHelper(userQuery, systemResponse) {
+
   try {
     const helperResponse = await client.chat.completions.create({
       model: deployment,
@@ -57,10 +78,18 @@ async function callResponseHelper(userQuery, systemResponse) {
 }
 
 /**
- * handleQuery
- * Logic for POST /api/query using Azure OpenAI
+ * Main entry point for processing AI queries.
+ * 
+ * Flow:
+ * 1. Primary AI Agent classifies and processes the query.
+ * 2. If a tool is requested (e.g., weather), it executes the tool.
+ * 3. Results are sent to a secondary Response Helper agent for final formatting.
+ * 
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
  */
 const handleQuery = async (req, res) => {
+
   const { prompt } = req.body;
 
   if (!prompt || typeof prompt !== "string" || !prompt.trim()) {

@@ -1,6 +1,16 @@
+/**
+ * @file debug_openai.js
+ * @description Utility script for debugging Azure OpenAI connectivity.
+ * Performs a manual fetch request to the OpenAI endpoint to bypass SDK-specific issues.
+ */
+
 require("dotenv").config();
 
+/**
+ * Debugs Azure OpenAI connection by performing a manual fetch request.
+ */
 async function debugOpenAI() {
+
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT.replace(/\/+$/, "");
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
   const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;

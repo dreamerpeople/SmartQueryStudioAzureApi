@@ -1,4 +1,11 @@
-require("dotenv").config();
+/**
+ * @file server.js
+ * @description Main Express server entry point.
+ * Integrates Microsoft Entra ID authentication and Azure OpenAI query services.
+ */
+
+
+
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
@@ -14,7 +21,7 @@ const PORT = process.env.PORT || 4041; // Using 4041 to avoid conflict with the 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:4200",
+    origin: "*",
     credentials: true,
   }),
 );
@@ -39,6 +46,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // ── Health check ──────────────────────────────────────────────────────────────
+/**
+ * Health check endpoint.
+ * @name GET /health
+ * @function
+ */
 app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
@@ -47,7 +59,9 @@ app.get("/health", (_req, res) => {
   });
 });
 
+
 // ── Routes ────────────────────────────────────────────────────────────────────
+
 app.use("/auth", authRouter);
 app.use("/api/query", ensureAuthenticated, queryRouter);
 

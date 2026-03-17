@@ -1,8 +1,19 @@
+/**
+ * @file verify_openai.js
+ * @description Utility script for verifying Azure OpenAI deployment configuration.
+ * Uses the initialized client to test model availability and response generation.
+ */
+
 require("dotenv").config();
 const { client, deployment } = require("./config/azureOpenAIClient");
 
+/**
+ * Verifies the Azure OpenAI deployment by sending a test message.
+ */
 async function verifyDeployment() {
+
   console.log(`\n🔍 Verifying Azure OpenAI Deployment: "${deployment}"...`);
+
   console.log(`📍 Endpoint: ${process.env.AZURE_OPENAI_ENDPOINT}`);
 
   try {

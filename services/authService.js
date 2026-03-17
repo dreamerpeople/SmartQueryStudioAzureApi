@@ -1,14 +1,17 @@
 /**
- * services/authService.js
- *
- * Encapsulates Microsoft Entra ID Client Credentials Flow (App-only).
+ * @file services/authService.js
+ * @description Encapsulates Microsoft Entra ID Client Credentials Flow for app-only authentication.
  * Uses MSAL's built-in in-memory caching for token reuse and auto-refresh.
  */
+
 
 const msal = require("@azure/msal-node");
 require("dotenv").config();
 
-/** @type {msal.Configuration} */
+/**
+ * MSAL Configuration for app-only authentication.
+ * @type {msal.Configuration}
+ */
 const msalConfig = {
   auth: {
     clientId: process.env.AZURE_CLIENT_ID,
@@ -17,6 +20,11 @@ const msalConfig = {
   },
   system: {
     loggerOptions: {
+      /**
+       * Logger callback for MSAL events.
+       * @param {number} loglevel - The log level.
+       * @param {string} message - The log message.
+       */
       loggerCallback(loglevel, message) {
         // console.log(message);
       },
@@ -26,7 +34,13 @@ const msalConfig = {
   },
 };
 
+
+/**
+ * Confidential Client Application instance for service-to-service calls.
+ * @type {msal.ConfidentialClientApplication}
+ */
 const cca = new msal.ConfidentialClientApplication(msalConfig);
+
 
 /**
  * Acquires an access token using Client Credentials flow.

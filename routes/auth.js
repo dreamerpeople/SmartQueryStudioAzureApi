@@ -1,4 +1,11 @@
+/**
+ * @file routes/auth.js
+ * @description Authentication routes for Microsoft Entra ID.
+ * Handles interactive login, callback processing, silent app authentication, and session management.
+ */
+
 const express = require("express");
+
 const { pca } = require("../config/azureAuth");
 const router = express.Router();
 
@@ -6,8 +13,15 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:4200";
 const REDIRECT_URI =
   process.env.REDIRECT_URI || "http://localhost:4040/auth/callback";
 
-// Initiate Microsoft login
+/**
+ * Initiates the Microsoft Entra ID authentication flow.
+ * Redirects the user to the Microsoft login page.
+ * 
+ * @name GET /auth/microsoft
+ * @function
+ */
 router.get("/microsoft", async (req, res) => {
+
   const authCodeUrlParameters = {
     scopes: ["user.read"],
     redirectUri: REDIRECT_URI,
@@ -22,8 +36,15 @@ router.get("/microsoft", async (req, res) => {
   }
 });
 
-// Behind the scenes / Silent App Login (Client Credentials)
+/**
+ * Silent application login using Microsoft Client Credentials flow.
+ * Used for service-to-service authentication or backend-initiated operations.
+ * 
+ * @name POST /auth/app-login
+ * @function
+ */
 router.post("/app-login", async (req, res) => {
+
   const clientCredentialRequest = {
     scopes: ["https://graph.microsoft.com/.default"], // Standard scope for app-only auth
   };
@@ -58,8 +79,15 @@ router.post("/app-login", async (req, res) => {
   }
 });
 
-// Callback
+/**
+ * Authentication callback endpoint.
+ * Processes the authorization code returned by Microsoft and acquires access tokens.
+ * 
+ * @name GET /auth/callback
+ * @function
+ */
 router.get("/callback", async (req, res) => {
+
   const tokenRequest = {
     code: req.query.code,
     scopes: ["user.read"],
@@ -81,15 +109,27 @@ router.get("/callback", async (req, res) => {
   }
 });
 
-// Logout
+/**
+ * Log out the current user and destroy the session.
+ * 
+ * @name GET /auth/logout
+ * @function
+ */
 router.get("/logout", (req, res) => {
+
   req.session.destroy(() => {
     res.redirect(`${FRONTEND_URL}/login`);
   });
 });
 
-// Current user
+/**
+ * Retrieve the current authenticated user's information.
+ * 
+ * @name GET /auth/user
+ * @function
+ */
 router.get("/user", (req, res) => {
+
   if (req.session && req.session.user) {
     res.json(req.user || req.session.user);
   } else {

@@ -1,8 +1,9 @@
 /**
- * daemon_app.js
- *
- * Secure Express API using Microsoft Entra ID Client Credentials Flow.
+ * @file daemon_app.js
+ * @description Secure Express API entry point using Microsoft Entra ID Client Credentials Flow.
+ * Designed for service-to-service communication and daemon applications.
  */
+
 
 require("dotenv").config();
 const express = require("express");
@@ -24,17 +25,30 @@ const PORT = process.env.PORT || 4045;
 // );
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:4200",
+    origin: "*",
     credentials: true,
   }),
 );
 
 app.use(express.json());
 
+/**
+ * Health check endpoint for the daemon API.
+ * @name GET /health
+ * @function
+ */
 app.get("/health", (req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
 });
 
+
+/**
+ * Protected endpoint demonstrating application-level authentication.
+ * Attaches MSAL token info to the response.
+ * 
+ * @name GET /api/protected
+ * @function
+ */
 app.get("/api/protected", injectAppToken, (req, res) => {
   const { accessToken, expiresOn, scopes } = req.appToken;
 
@@ -54,6 +68,7 @@ app.get("/api/protected", injectAppToken, (req, res) => {
     },
   });
 });
+
 app.get("/api/user", (req, res) => {
   if (req.session && req.session.user) {
     res.json(req.user || req.session.user);
