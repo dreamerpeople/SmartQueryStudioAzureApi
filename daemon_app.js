@@ -14,18 +14,13 @@ const queryRouter = require("./routes/query");
 const app = express();
 const PORT = process.env.PORT || 4045;
 
-// app.use(
-//   cors({
-//     origin: process.env.ALLOWED_ORIGINS
-//       ? process.env.ALLOWED_ORIGINS.split(",")
-//       : "*",
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   }),
-// );
 app.use(
   cors({
-    origin: "*",
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
