@@ -12,6 +12,7 @@ const {
   deployment,
 } = require("../config/azureOpenAIClient");
 const axios = require("axios");
+const { executeSql } = require("../services/dremioService");
 
 /**
  * Fetches current weather data for a given city using Open-Meteo API.
@@ -145,6 +146,30 @@ const handleQuery = async (req, res) => {
             systemResult = {
               type: "error",
               message: "Unable to fetch weather data right now.",
+            };
+          }
+        }
+      } else if (systemResult.tool === "dremio") {
+        const sql = systemResult?.params?.sql;
+        if (!sql) {
+          systemResult = {
+            type: "error",
+            message: "SQL query is required for Dremio tool.",
+          };
+        } else {
+          try {
+            const dataResult = await executeSql(sql);
+            systemResult = {
+              type: "tool_output",
+              tool: "dremio",
+              data: dataResult.rows,
+              query: dataResult.query, // Pass the query back for the response helper
+            };
+          } catch (err) {
+            console.error("Dremio SQL error:", err.message);
+            systemResult = {
+              type: "error",
+              message: "Unable to query database right now.",
             };
           }
         }
