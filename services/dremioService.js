@@ -42,7 +42,7 @@ async function executeSql(sql) {
     let attempts = 0;
     const maxAttempts = 30; // 30 seconds max
 
-    while (['RUNNING', 'STARTING', 'PENDING', 'METADATA_RETRIEVAL'].includes(status) && attempts < maxAttempts) {
+    while (['RUNNING', 'STARTING', 'PENDING', 'METADATA_RETRIEVAL', 'PLANNING'].includes(status) && attempts < maxAttempts) {
       const jobRes = await axios.get(`${baseUrl}/job/${jobId}`, {
         headers: { 'Authorization': `Bearer ${DREMIO_TOKEN}` }
       });

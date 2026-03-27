@@ -41,6 +41,50 @@ async function getWeather(city) {
   };
 }
 
+/**
+ * Fetches top news headlines based on a query, category, or location.
+ * Requires NEWS_API_KEY in .env.
+ * 
+ * @param {string} [query] - Search term for news (e.g., "AI", "Economy").
+ * @param {string} [category] - News category (e.g., "technology", "business").
+ * @param {string} [location] - Location for news (e.g., "Dhaka", "London").
+ * @returns {Promise<Array<{title: string, source: string, url: string, description: string}>>} Array of articles.
+ */
+async function getNews(query, category, location) {
+  const apiKey = process.env.NEWS_API_KEY;
+  if (!apiKey) {
+    throw new Error("NEWS_API_KEY is missing in configuration.");
+  }
+
+  let fullQuery = query || "";
+  if (location) {
+    fullQuery = fullQuery ? `${fullQuery} in ${location}` : location;
+  }
+
+  // Use /everything if we have a specific search query or location
+  // Otherwise, use /top-headlines for general categories
+  let url;
+  if (fullQuery) {
+    url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(fullQuery)}&sortBy=publishedAt&apiKey=${apiKey}`;
+  } else {
+    url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+    if (category) url += `&category=${category}`;
+  }
+
+  const response = await axios.get(url);
+  
+  if (response.data.status !== "ok") {
+    throw new Error(response.data.message || "Failed to fetch news.");
+  }
+
+  return response.data.articles.slice(0, 5).map(article => ({
+    title: article.title,
+    source: article.source.name,
+    description: article.description,
+    url: article.url,
+  }));
+}
+
 
 /**
  * Passes original query and system agent result to the helper agent for structuring.
@@ -172,6 +216,24 @@ const handleQuery = async (req, res) => {
               message: "Unable to query database right now.",
             };
           }
+        }
+      } else if (systemResult.tool === "news") {
+        const { query, category, location } = systemResult?.params || {};
+        try {
+          const news = await getNews(query, category, location);
+          systemResult = {
+            type: "tool_output",
+            tool: "news",
+            data: news,
+          };
+        } catch (err) {
+          console.error("News API error:", err.message);
+          systemResult = {
+            type: "error",
+            message: err.message.includes("NEWS_API_KEY") 
+              ? "News service not configured. Please add NEWS_API_KEY to .env." 
+              : "Unable to fetch news data right now.",
+          };
         }
       } else {
         systemResult = {
