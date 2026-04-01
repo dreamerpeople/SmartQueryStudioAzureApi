@@ -6,9 +6,10 @@
 const { executeSql } = require("./services/dremioService");
 
 async function listTables() {
-  const sql = 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA."TABLES" WHERE TABLE_SCHEMA = \'EcommerceDB.ecommercedb\'';
+  const sql =
+    "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.\"TABLES\" WHERE TABLE_SCHEMA = 'EcommerceDB.dpcommerce'";
   console.log(`\n🔍 Fetching tables from Dremio...`);
-  
+
   try {
     const response = await executeSql(sql);
     console.log("\n✅ Tables found:");

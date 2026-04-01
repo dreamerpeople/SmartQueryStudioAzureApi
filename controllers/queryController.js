@@ -13,6 +13,7 @@ const {
 } = require("../config/azureOpenAIClient");
 const axios = require("axios");
 const { executeSql } = require("../services/dremioService");
+const { getDynamicSchemaContext } = require("../services/schemaService");
 
 /**
  * Fetches current weather data for a given city using Open-Meteo API.
@@ -147,11 +148,15 @@ const handleQuery = async (req, res) => {
   try {
     console.log("Original Prompt:", prompt);
 
+    // Inject Dynamic Schema Here
+    const dynamicSchema = await getDynamicSchemaContext();
+    const finalSystemPrompt = SYSTEM_PROMPT.replace("{{DYNAMIC_SCHEMA}}", dynamicSchema);
+
     // STEP 1: Main System Agent Logic
     const response = await client.chat.completions.create({
       model: deployment,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: finalSystemPrompt },
         { role: "user", content: prompt.trim() },
       ],
       temperature: 0.3,

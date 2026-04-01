@@ -48,28 +48,23 @@ You can:
 ── Database Schema Context (Dremio) ──────────────────────────────────────────
 Source: EcommerceDB
 Default Schema: ecommercedb
-Full Table Path Pattern: EcommerceDB.ecommercedb.<table_name>
+Full Table Path Pattern: EcommerceDB.dpcommerce.<table_name>
 
 Common Tables & Relationships:
-• categories (id, name, description, active, createdAt)
-• columns_config (columnName, isActive)
-• products (productName, category, sku, description, productLabel, productStatus, country, active, createdAt)
-• customers (customer_id, first_name, last_name, email, city, country)
-• orders (order_id, customer_id, order_date, total_amount, status)
-• order_items (order_item_id, order_id, product_id, quantity, unit_price)
+{{DYNAMIC_SCHEMA}}
 
 Joins:
 - products.category = categories.name (logical join for category details)
-- orders.customer_id = customers.customer_id
-- order_items.order_id = orders.order_id
-- order_items.product_id = products._id
+- orders.customerId = customers.customerId
+- order_items.orderId = orders.orderId
+- order_items.productId = products._id
 
 SQL Generation Rules:
-1. Always use the Full Path: EcommerceDB.ecommercedb.<table_name>
+1. Always use the Full Path: EcommerceDB.dpcommerce.<table_name>
 2. **Strict Table Selection**: Analyze the user's intent carefully. Do NOT default to the 'products' table if the user is asking about customers, orders, or other entities.
 3. **Joins**: ALWAYS use JOINs when the query involves related data (e.g., customers and their orders, or products and their quantities in order_items). Use the relationships defined above.
-4. **Column Aliasing**: Use clear aliases if columns from different tables have the same name (e.g., c.first_name, p.product_name).
-5. If the user asks for a table not listed above, assume it's in EcommerceDB.ecommercedb and use its name.
+4. **Column Aliasing**: Use clear aliases if columns from different tables have the same name (e.g., c.firstName, p.productName).
+5. If the user asks for a table not listed above, assume it's in EcommerceDB.dpcommerce and use its name.
 6. If column names are unknown, use SELECT * or common naming conventions (e.g., table_id, name, date).
 ──────────────────────────────────────────────────────────────────────────────
 
@@ -143,7 +138,7 @@ Example for "list all customers":
 "type": "tool_request",
 "tool": "dremio",
 "params": {
-"sql": "SELECT * FROM EcommerceDB.ecommercedb.customers"
+"sql": "SELECT * FROM EcommerceDB.dpcommerce.customers"
 }
 }
 
@@ -152,7 +147,7 @@ Example for "list all categories":
 "type": "tool_request",
 "tool": "dremio",
 "params": {
-"sql": "SELECT * FROM EcommerceDB.ecommercedb.categories"
+"sql": "SELECT * FROM EcommerceDB.dpcommerce.categories"
 }
 }
 
@@ -161,7 +156,7 @@ Example for "show columns config":
 "type": "tool_request",
 "tool": "dremio",
 "params": {
-"sql": "SELECT * FROM EcommerceDB.ecommercedb.columns_config"
+"sql": "SELECT * FROM EcommerceDB.dpcommerce.columns_config"
 }
 }
 
@@ -170,7 +165,7 @@ Example for "top products":
 "type": "tool_request",
 "tool": "dremio",
 "params": {
-"sql": "SELECT product_name, price FROM EcommerceDB.ecommercedb.products ORDER BY price DESC"
+"sql": "SELECT product_name, price FROM EcommerceDB.dpcommerce.products ORDER BY price DESC"
 }
 }
 
@@ -179,7 +174,7 @@ Example for "customer names and their total order amounts":
 "type": "tool_request",
 "tool": "dremio",
 "params": {
-"sql": "SELECT c.first_name, c.last_name, SUM(o.total_amount) as total_spent FROM EcommerceDB.ecommercedb.customers c JOIN EcommerceDB.ecommercedb.orders o ON c.customer_id = o.customer_id GROUP BY c.first_name, c.last_name ORDER BY total_spent DESC"
+"sql": "SELECT c.firstName, c.lastName, SUM(o.totalAmount) as total_spent FROM EcommerceDB.dpcommerce.customers c JOIN EcommerceDB.dpcommerce.orders o ON c.customerId = o.customerId GROUP BY c.firstName, c.lastName ORDER BY total_spent DESC"
 }
 }
 
