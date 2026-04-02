@@ -219,6 +219,7 @@ const handleQuery = async (req, res) => {
             systemResult = {
               type: "error",
               message: "Unable to query database right now.",
+              query: sql,
             };
           }
         }
