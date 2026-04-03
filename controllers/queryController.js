@@ -110,7 +110,7 @@ async function callResponseHelper(userQuery, systemResponse) {
         },
       ],
       temperature: 0.3,
-      max_tokens: 1024,
+      max_tokens: 4096,
       response_format: { type: "json_object" },
     });
 
@@ -186,7 +186,7 @@ const handleQuery = async (req, res) => {
           try {
             const weather = await getWeather(city);
             systemResult = {
-              type: "tool_output",
+              type: "conversational",
               tool: "weather",
               data: weather,
             };
@@ -209,7 +209,7 @@ const handleQuery = async (req, res) => {
           try {
             const dataResult = await executeSql(sql);
             systemResult = {
-              type: "tool_output",
+              type: "data_result",
               tool: "dremio",
               data: dataResult.rows,
               query: dataResult.query, // Pass the query back for the response helper
@@ -228,7 +228,7 @@ const handleQuery = async (req, res) => {
         try {
           const news = await getNews(query, category, location);
           systemResult = {
-            type: "tool_output",
+            type: "news",
             tool: "news",
             data: news,
           };
